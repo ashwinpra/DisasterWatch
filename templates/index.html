@@ -97,25 +97,32 @@
             })
             .then(response => response.json())
             .then(data => {
+                // Log the response to the console
+                console.log(data);
+
                 // Clear existing markers
                 markers.clearLayers();
-
-                // Insert the commentary into the new textarea
-                document.getElementById('commentary').innerText = data.commentary;
+                console.log("Yo");
+                // Insert data in the format commentary \n Location: location \n Date: date \n Source: source 
+                var commentary = '';
+                data.forEach(item => {
+                    commentary += `${item.commentary} <br> <b>Location:</b> ${item.location} <br> <b>Date:</b> ${item.date} <br> <b>Source:</b> ${item.source} <br> <br>`;
+                });
+                document.getElementById('commentary').innerHTML = commentary;
 
                 // Set the view to the first location in the returned data
-                mymap.setView([parseFloat(data.locations_data[0].latitude), parseFloat(data.locations_data[0].longitude)], 8);
+                mymap.setView([parseFloat(data[0].latitude), parseFloat(data[0].longitude)], 8);
 
                 // Set the tile layer
                 L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWlsc29uaTIwMSIsImEiOiJjbGVma203M2kwaHllM3JtdnNuODlsazY1In0.JBnsmC5BGpr6MzoYa_IJow', {
                     maxZoom: 19,
                     id: 'mapbox/streets-v11', // Here you can change the map style
                     tileSize: 512,
-                    zoomOffset: -1,
+                    zoomOffset: -1
                 }).addTo(mymap);
 
                 // Add new markers
-                data.locations_data.forEach(item => {
+                data.forEach(item => {
                     var marker = L.marker([parseFloat(item.latitude), parseFloat(item.longitude)]).addTo(markers);
                     marker.bindPopup(`<b>${item.location}</b>`);
                 });
